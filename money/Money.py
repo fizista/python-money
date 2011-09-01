@@ -54,7 +54,8 @@ class Money:
 
     def __unicode__(self):
         return unicode(self.amount)
-
+    def __float__(self):
+        return float(self.amount)
     def __repr__(self):
         return '%s %5.2f' % (self.currency, self.amount)
     def __pos__(self):
