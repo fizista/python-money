@@ -19,6 +19,12 @@ class Currency:
 
     def __repr__(self):
         return self.code
+    def __eq__(self, other):
+        if isinstance(other, Currency):
+            return self.code == other.code
+        return False
+    def __ne__(self, other):
+        return not self.__eq__(other)
     def set_exchange_rate(self, rate):
         if not isinstance(rate, Decimal):
             rate = Decimal(str(rate))
@@ -53,11 +59,13 @@ class Money:
             self.currency = currency
 
     def __unicode__(self):
-        return unicode(self.amount)
+        return u'%s%5.2f' % (self.currency.symbol, self.amount)
     def __float__(self):
         return float(self.amount)
     def __repr__(self):
         return '%s %5.2f' % (self.currency, self.amount)
+    def __str__(self):
+         return self.__unicode__()
     def __pos__(self):
         return Money(amount=self.amount, currency=self.currency)
     def __neg__(self):
