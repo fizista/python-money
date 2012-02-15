@@ -39,6 +39,7 @@ class SimpleMoneyField(forms.DecimalField):
         self.currency = kwargs.pop('currency')
         self.widget = CurrencyTextInput()
         super(SimpleMoneyField, self).__init__(*args, decimal_places=2, max_digits=12, **kwargs)
+        self.initial = Money(amount=self.initial, currency=self.currency)
 
     def prepare_value(self, value):
         if isinstance(value, Money):
