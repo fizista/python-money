@@ -59,7 +59,7 @@ class Money:
             self.currency = currency
 
     def __unicode__(self):
-        return u'%s%.2f' % (self.currency.symbol, self.amount)
+        return self.format_display()
     def __float__(self):
         return float(self.amount)
     def __repr__(self):
@@ -202,6 +202,26 @@ class Money:
                 self.amount = Decimal(s[3:].strip())
             except:
                 raise IncorrectMoneyInputError
+
+    def format_display(self):
+        format = CURRENCY_FORMATS.get(self.currency.code, None)
+        if format is None:
+            return u'%s%.2f' % (self.currency.symbol, self.amount)
+
+        symbol = format['symbol']
+        thousand_sep = format['thousand']
+        decimal_sep = format['decimal']
+    
+        if self.amount >= 0:
+            tmpl = "%s%s%s%s"
+        else:
+            tmpl = "-%s%s%s%s"
+        val = abs(self.amount)
+    
+        f = lambda x, n, acc=[]: f(x[:-n], n, [(x[-n:])]+acc) if x else acc
+        intpart = thousand_sep.join(f(str(val).split('.')[0], 3))
+        return tmpl % (symbol, intpart, decimal_sep, ('%0.2f' % val)[-2:])
+
 
 #
 # Definitions of ISO 4217 Currencies
@@ -367,3 +387,8 @@ CURRENCY['BAM'] = Currency(code='BAM', numeric='977', name='Convertible Marks', 
 CURRENCY['LTL'] = Currency(code='LTL', numeric='440', name='Lithuanian Litas', countries=['LITHUANIA'])
 CURRENCY['ETB'] = Currency(code='ETB', numeric='230', name='Ethiopian Birr', countries=['ETHIOPIA'])
 CURRENCY['XPF'] = Currency(code='XPF', numeric='953', name='CFP Franc', countries=['FRENCH POLYNESIA', 'NEW CALEDONIA', 'WALLIS AND FUTUNA'])
+
+CURRENCY_FORMATS = {
+    'USD' : {'symbol': u'$', 'decimal': '.', 'thousand': ','},
+    'GBP' : {'symbol': u'£', 'decimal': '.', 'thousand': ','},
+}
