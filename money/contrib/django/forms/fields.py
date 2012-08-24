@@ -45,3 +45,7 @@ class SimpleMoneyField(forms.DecimalField):
         if isinstance(value, Money):
             return value
         return Money(amount=value, currency=self.currency)
+
+    def clean(self, value):
+        value = super(SimpleMoneyField, self).clean(value)
+        return Money(amount=value, currency=self.currency)

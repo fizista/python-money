@@ -162,7 +162,10 @@ class SimpleMoneyField(MoneyField):
         return super(SimpleMoneyField, self).formfield(**defaults)
 
     def save_form_data(self, instance, data):
-        money_data = Money(amount=data, currency=self.default_currency)
+        if isinstance(data, Money):
+            money_data = data
+        else:
+            money_data = Money(amount=data, currency=self.default_currency)
         setattr(instance, self.name, money_data)
 
 
