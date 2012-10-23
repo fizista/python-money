@@ -32,8 +32,8 @@ class MoneyFieldProxy(object):
         self.currency_field_name = currency_field_name(self.field.name)
 
     def _money_from_obj(self, obj):
-        if obj.__dict__[self.field.name] == None:
-            return None
+        #if obj.__dict__[self.field.name] == None:
+            #return None
         return Money(obj.__dict__[self.field.name], obj.__dict__[self.currency_field_name])
 
     def __get__(self, obj, type=None):
@@ -126,8 +126,10 @@ class MoneyField(models.DecimalField):
     def get_prep_lookup(self, lookup_type, value):
         if not lookup_type in SUPPORTED_LOOKUPS:
             raise NotSupportedLookup(lookup_type)
-        value = self.get_db_prep_save(value)
-        return super(MoneyField, self).get_prep_lookup(lookup_type, value)
+        if hasattr(value, "amount"):
+            return value.amount
+        else:
+            return int(value)
 
     def get_default(self):
         if isinstance(self.default, Money):
