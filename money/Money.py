@@ -365,7 +365,7 @@ CURRENCY['BAM'] = Currency(code='BAM', numeric='977', name='Convertible Marks', 
 CURRENCY['LTL'] = Currency(code='LTL', numeric='440', name='Lithuanian Litas', countries=['LITHUANIA'])
 CURRENCY['ETB'] = Currency(code='ETB', numeric='230', name='Ethiopian Birr', countries=['ETHIOPIA'])
 CURRENCY['XPF'] = Currency(code='XPF', numeric='953', name='CFP Franc', countries=['FRENCH POLYNESIA', 'NEW CALEDONIA', 'WALLIS AND FUTUNA'])
-
+CURRENCY['COP'] = Currency(code='COP', numeric='170', name='Colombian Peso', countries=['COLOMBIA'])
 #
 # Dictionary of currencies by ISO country code
 # Source: http://www.panalpina.com/www/global/en/tools_resources/unit_converter/currency_codes.html
@@ -419,7 +419,7 @@ CURRENCY_BY_COUNTRY = {
    'CN': CURRENCY['CNY'],
    'CX': CURRENCY['AUD'],
    'CC': CURRENCY['AUD'],
-   #'CO': CURRENCY['COP'],
+   'CO': CURRENCY['COP'],
    'KM': CURRENCY['KMF'],
    #'CG': CURRENCY['XAF'],
    #'CD': CURRENCY['CDF'],
