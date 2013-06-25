@@ -43,47 +43,54 @@ class Currency(object):
         return self.code
 
 
-
 CURRENCY = {}
 CURRENCY['XXX'] = Currency(code="XXX", numeric="999")
 DEFAULT_CURRENCY = CURRENCY['XXX']
+
 
 def set_default_currency(code="XXX"):
     global DEFAULT_CURRENCY
     DEFAULT_CURRENCY = CURRENCY[code]
 
+
 class IncorrectMoneyInputError(exceptions.Exception):
-    def __init__(self):
-        return
+
     def __unicode__(self):
         return u"Incorrectly formatted monetary input"
 
-class Money:
-    amount = decimal.Decimal("0.0")
-    currency = DEFAULT_CURRENCY
-    def __init__ (self, amount=decimal.Decimal("0.0"), currency=None):
+
+class Money(object):
+
+    amount = NotImplemented
+
+    currency = NotImplemented 
+
+    def __init__ (self, amount=None, currency=None):
         if not isinstance(amount, decimal.Decimal):
-            amount = decimal.Decimal(str(amount or 0))
+            amount = decimal.Decimal(amount or 0.0)
         self.amount = amount
-        if not currency:
-            self.currency = DEFAULT_CURRENCY
-        else:
-            if not isinstance(currency, Currency):
-                currency = CURRENCY[str(currency).upper()]
-            self.currency = currency
+        if not isinstance(currency, Currency):
+            currency = CURRENCY[str(currency or DEFAULT_CURRENCY).upper()]
+        self.currency = currency
 
     def __unicode__(self):
         return self.format_display()
+
     def __float__(self):
         return float(self.amount)
+
     def __repr__(self):
         return '%s %5.2f' % (self.currency, self.amount)
+
     def __str__(self):
          return self.__unicode__()
+
     def __pos__(self):
         return Money(amount=self.amount, currency=self.currency)
+
     def __neg__(self):
         return Money(amount=-self.amount, currency=self.currency)
+
     def __add__(self, other):
         if isinstance(other, Money):
             if self.currency == other.currency:
@@ -94,6 +101,7 @@ class Money:
                 return Money(amount = s.amount + other.amount, currency = DEFAULT_CURRENCY)
         else:
             return Money(amount = self.amount + decimal.Decimal(str(other)), currency = self.currency)
+
     def __sub__(self, other):
         if isinstance(other, Money):
             if self.currency == other.currency:
@@ -104,17 +112,20 @@ class Money:
                 return Money(amount = s.amount - other.amount, currency = DEFAULT_CURRENCY)
         else:
             return Money(amount = self.amount - decimal.Decimal(str(other)), currency = self.currency)
+
     def __mul__(self, other):
         if isinstance(other, Money):
             raise TypeError, 'can not multiply monetary quantities'
         else:
             return Money(amount = self.amount*decimal.Decimal(str(other)), currency = self.currency)
+
     def __div__(self, other):
         if isinstance(other, Money):
             assert self.currency == other.currency, 'currency mismatch'
             return self.amount / other.amount
         else:
             return self.amount / decimal.Decimal(str(other))
+
     def __rmod__(self, other):
         """
         Calculate percentage of an amount.  The left-hand side of the operator must be a numeric value.  E.g.:
@@ -126,8 +137,10 @@ class Money:
             raise TypeError, 'invalid monetary operation'
         else:
             return Money(amount = decimal.Decimal(str(other)) * self.amount / 100, currency = self.currency)
+
     def convert_to_default(self):
         return Money(amount = self.amount * self.currency.exchange_rate, currency=DEFAULT_CURRENCY)
+
     def convert_to(self, currency):
         """
         Convert from one currency to another.
@@ -155,6 +168,7 @@ class Money:
         if result is NotImplemented:
             return result
         return not result
+
     def __lt__(self, other):
         if isinstance(other, Money):
             if (self.currency == other.currency):
@@ -163,6 +177,7 @@ class Money:
                 raise TypeError, 'can not compare different currencies'
         else:
             return (self.amount < decimal.Decimal(str(other)))
+
     def __gt__(self, other):
         if isinstance(other, Money):
             if (self.currency == other.currency):
@@ -171,8 +186,10 @@ class Money:
                 raise TypeError, 'can not compare different currencies'
         else:
             return (self.amount > decimal.Decimal(str(other)))
+
     def __le__(self, other):
         return self < other or self == other
+
     def __ge__(self, other):
         return self > other or self == other
 
