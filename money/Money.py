@@ -59,11 +59,13 @@ class Money:
             self.currency = currency
 
     def __unicode__(self):
-        return unicode(self.amount)
+        return self.format_display()
     def __float__(self):
         return float(self.amount)
     def __repr__(self):
         return '%s %5.2f' % (self.currency, self.amount)
+    def __str__(self):
+         return self.__unicode__()
     def __pos__(self):
         return Money(amount=self.amount, currency=self.currency)
     def __neg__(self):
@@ -200,6 +202,26 @@ class Money:
                 self.amount = Decimal(s[3:].strip())
             except:
                 raise IncorrectMoneyInputError
+
+    def format_display(self):
+        format = CURRENCY_FORMATS.get(self.currency.code, None)
+        if format is None:
+            return u'%s%.2f' % (self.currency.symbol, self.amount)
+
+        symbol = format['symbol']
+        thousand_sep = format['thousand']
+        decimal_sep = format['decimal']
+    
+        if self.amount >= 0:
+            tmpl = "%s%s%s%s"
+        else:
+            tmpl = "-%s%s%s%s"
+        val = abs(self.amount)
+    
+        f = lambda x, n, acc=[]: f(x[:-n], n, [(x[-n:])]+acc) if x else acc
+        intpart = thousand_sep.join(f(str(val).split('.')[0], 3))
+        return tmpl % (symbol, intpart, decimal_sep, ('%0.2f' % val)[-2:])
+
 
 #
 # Definitions of ISO 4217 Currencies
@@ -611,3 +633,7 @@ CURRENCY_BY_COUNTRY = {
    'ZW': CURRENCY['ZWD'],
 }
 
+CURRENCY_FORMATS = {
+    'USD' : {'symbol': u'$', 'decimal': '.', 'thousand': ','},
+    'GBP' : {'symbol': u'£', 'decimal': '.', 'thousand': ','},
+}

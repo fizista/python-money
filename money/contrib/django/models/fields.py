@@ -152,6 +152,27 @@ class MoneyField(models.DecimalField):
         return super(MoneyField, self).formfield(**defaults)
 
 
+class SimpleMoneyField(MoneyField):
+    """
+    Capture default currency but simplify presentation as decimal and currency symbol
+    """
+    #def __init__(self, default_currency, **kwargs):
+    #    # Require default_currency since it is an implicit attribute of this field
+    #    super(SimpleMoneyField, self).__init__(default_currency=default_currency, **kwargs)
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.SimpleMoneyField, 'currency': self.default_currency}
+        defaults.update(kwargs)
+        return super(SimpleMoneyField, self).formfield(**defaults)
+
+    def save_form_data(self, instance, data):
+        if isinstance(data, Money):
+            money_data = data
+        else:
+            money_data = Money(amount=data, currency=self.default_currency)
+        setattr(instance, self.name, money_data)
+
+
 # South introspection rules
 # (see http://south.aeracode.org/docs/customfields.html#extending-introspection)
 try:
@@ -167,6 +188,15 @@ try:
         patterns=["^money\.contrib\.django.\models\.fields\.MoneyField"],
         rules=[
             (   (MoneyField,),
+                [],
+                {'no_currency_field': ('add_currency_field', {})}
+            )
+        ]
+    )
+    add_introspection_rules(
+        patterns=["^money\.contrib\.django.\models\.fields\.SimpleMoneyField"],
+        rules=[
+            (   (SimpleMoneyField,),
                 [],
                 {'no_currency_field': ('add_currency_field', {})}
             )

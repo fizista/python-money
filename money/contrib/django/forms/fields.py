@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from widgets import CurrencySelectWidget
+from widgets import CurrencySelectWidget, CurrencyTextInput
 from money import Money, CURRENCY
 
 class MoneyField(forms.MultiValueField):
@@ -32,3 +32,20 @@ class MoneyField(forms.MultiValueField):
             return Money(*data_list)
         return None
 
+
+class SimpleMoneyField(forms.DecimalField):
+
+    def __init__(self, decimal_places=2, max_digits=12, *args, **kwargs):
+        self.currency = kwargs.pop('currency')
+        self.widget = CurrencyTextInput()
+        super(SimpleMoneyField, self).__init__(*args, decimal_places=2, max_digits=12, **kwargs)
+        self.initial = Money(amount=self.initial, currency=self.currency)
+
+    def prepare_value(self, value):
+        if isinstance(value, Money):
+            return value
+        return Money(amount=value, currency=self.currency)
+
+    def clean(self, value):
+        value = super(SimpleMoneyField, self).clean(value)
+        return Money(amount=value, currency=self.currency)
