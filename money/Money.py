@@ -2,33 +2,47 @@
 import exceptions
 import decimal
 
-class Currency:
-    code = "XXX"
-    country = ""
-    countries = []
-    name = ""
-    numeric = "999"
-    exchange_rate = decimal.Decimal("1.0")
-    def __init__(self, code="", numeric="999", name="", symbol=u"", decimals=2, countries=[]):
-        self.code = code
-        self.numeric = numeric
-        self.name = name
-        self.symbol = symbol
-        self.decimals = decimals
-        self.countries = countries
 
-    def __repr__(self):
-        return self.code
-    def __eq__(self, other):
-        if isinstance(other, Currency):
-            return self.code and other.code and self.code == other.code
-        return False
-    def __ne__(self, other):
-        return not self.__eq__(other)
+class Currency(object):
+
+    code = NotImplemented
+
+    country = NotImplemented
+
+    countries = NotImplemented 
+
+    name = NotImplemented 
+
+    numeric = NotImplemented 
+
+    exchange_rate = decimal.Decimal("1.0")
+
+    def __init__(self, code=None, numeric=None, name=None, symbol=None,
+                 decimals=None, countries=None):
+        self.code = code or ""
+        self.numeric = numeric or "999"
+        self.name = name or ""
+        self.symbol = symbol or u""
+        self.decimals = decimals or 2
+        self.countries = countries or []
+
     def set_exchange_rate(self, rate):
         if not isinstance(rate, decimal.Decimal):
             rate = decimal.Decimal(str(rate))
         self.exchange_rate = rate
+
+    def __eq__(self, other):
+        if isinstance(other, Currency):
+            return self.code and other.code and self.code == other.code
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __repr__(self):
+        return self.code
+
+
 
 CURRENCY = {}
 CURRENCY['XXX'] = Currency(code="XXX", numeric="999")
