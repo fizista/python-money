@@ -10,8 +10,13 @@ class MoneyField(forms.MultiValueField):
 
     def __init__(self, choices=None, decimal_places=2, max_digits=12, *args, **kwargs):
         # Note that we catch args and kwargs that must only go to one field
-        # or the other. The rest of them pass onto the decimal field.
-        choices = choices or list(( (u"%s" % (c.code,), u"%s - %s" % (c.code, c.name)) for i, c in sorted(CURRENCY.items()) if c.code != 'XXX'))
+            # or the other. The rest of them pass onto the decimal field.
+        choices = choices or [
+            (u"%s" % (c.code,), u"%s - %s" % (c.code, c.name))
+            for i, c in sorted(CURRENCY.items())
+            if c.code != 'XXX'
+        ]
+
 
         self.widget = CurrencySelectWidget(choices)
 

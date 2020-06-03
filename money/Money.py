@@ -43,8 +43,7 @@ class Currency(object):
         return self.code
 
 
-CURRENCY = {}
-CURRENCY['XXX'] = Currency(code="XXX", numeric="999")
+CURRENCY = {'XXX': Currency(code='XXX', numeric='999')}
 DEFAULT_CURRENCY = CURRENCY['XXX']
 
 
@@ -159,9 +158,7 @@ class Money(object):
         if isinstance(other, Money):
             return (self.amount == other.amount) and (self.currency == other.currency)
         # Allow comparison to 0
-        if (other == 0) and (self.amount == 0):
-            return True
-        return False
+        return (other == 0) and (self.amount == 0)
 
     def __ne__(self, other):
         result = self.__eq__(other)
@@ -204,13 +201,14 @@ class Money(object):
         total = sum(ratios)
         remainder = self.amount
         results = []
-        for i in range(0, len(ratios)):
-            results.append(Money(amount = self.amount * ratios[i] / total, currency = self.currency))
+        for i in range(len(ratios)):
+            results.append(
+                Money(amount=remainder * ratios[i] / total, currency=self.currency)
+            )
+
             remainder -= results[i].amount
-        i = 0
-        while i < remainder:
+        for i in range(remainder):
             results[i].amount += decimal.Decimal("0.01")
-            i += 1
         return results
 
     def spell_out(self):
@@ -242,13 +240,10 @@ class Money(object):
         symbol = format['symbol']
         thousand_sep = format['thousand']
         decimal_sep = format['decimal']
-    
-        if self.amount >= 0:
-            tmpl = "%s%s%s%s"
-        else:
-            tmpl = "-%s%s%s%s"
+
+        tmpl = "%s%s%s%s" if self.amount >= 0 else "-%s%s%s%s"
         val = abs(self.amount)
-    
+
         f = lambda x, n, acc=[]: f(x[:-n], n, [(x[-n:])]+acc) if x else acc
         intpart = thousand_sep.join(f(str(val).split('.')[0], 3))
         return tmpl % (symbol, intpart, decimal_sep, ('%0.2f' % val)[-2:])

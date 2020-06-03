@@ -17,19 +17,11 @@ class CurrencyTextInput(forms.TextInput):
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or inital value we get
-        # is None, replace it w/ u''.
-        if data is None:
-            data_value = u''
-        else:
-            data_value = data
-        if initial is None:
-            initial_value = u''
-        else:
-            initial_value = initial.amount
-        if force_unicode(initial_value) != force_unicode(data_value):
-            return True
-        return False
+            # the same as an empty string, if the data or inital value we get
+            # is None, replace it w/ u''.
+        data_value = u'' if data is None else data
+        initial_value = u'' if initial is None else initial.amount
+        return force_unicode(initial_value) != force_unicode(data_value)
 
 class CurrencySelectWidget(forms.MultiWidget):
     """

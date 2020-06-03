@@ -64,8 +64,7 @@ class CurrencyField(models.CharField):
         When serializing, we want to output as two values. This will be just
         the currency part as stored directly in the database.
         """
-        value = self._get_val_from_obj(obj)
-        return value
+        return self._get_val_from_obj(obj)
 
 
 class MoneyField(models.DecimalField):
@@ -124,7 +123,7 @@ class MoneyField(models.DecimalField):
         return super(MoneyField, self).get_db_prep_save(value, *args, **kwargs)
 
     def get_prep_lookup(self, lookup_type, value):
-        if not lookup_type in SUPPORTED_LOOKUPS:
+        if lookup_type not in SUPPORTED_LOOKUPS:
             raise NotSupportedLookup(lookup_type)
         if hasattr(value, "amount"):
             return value.amount

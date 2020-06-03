@@ -40,7 +40,7 @@ class MoneyFieldTestCase(TestCase):
 
 
     def assertSameCurrency(self, moneys, currency=None):
-        currencies = set([m.currency for m in moneys])
+        currencies = {m.currency for m in moneys}
         self.assertTrue(len(currencies) == 1)
         if currency:
             self.assertEqual(currencies.pop().code, currency)
@@ -48,7 +48,7 @@ class MoneyFieldTestCase(TestCase):
     def testCreating(self):
         ind = 0
         for code, currency in CURRENCY.items():
-            ind = ind + 1
+            ind += 1
             price = Money(ind*1000.0, code)
             TestMoneyModel.objects.create(name=currency.name, price=price)
         count = TestMoneyModel.objects.all().count()
